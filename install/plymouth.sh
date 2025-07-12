@@ -118,4 +118,7 @@ if ! command -v plymouth &>/dev/null; then
   sudo cp -r "$HOME/.local/share/omarchy/default/plymouth" /usr/share/plymouth/themes/omarchy/
 
   sudo plymouth-set-default-theme -R omarchy
+
+  # Set up seamless auto-login for smooth Plymouth transition
+  bash "$HOME/.local/share/omarchy/install/seamless-login.sh"
 fi
