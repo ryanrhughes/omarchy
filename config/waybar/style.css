@@ -1,12 +1,42 @@
-/* Import Omarchy defaults */
-@import "../../.local/share/omarchy/default/waybar/style.css";
 @import "../omarchy/current/theme/waybar.css";
 
-/* Add your own customizations or imports below
- * customizations will override defaults */
-/* @import "module-custom.css"; 
- *
- * {
- *  font-size: 16px;
- * }
- * */
+* {
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  font-family: CaskaydiaMono Nerd Font Propo;
+  font-size: 12px;
+}
+
+#workspaces button {
+  all: initial;
+  padding: 2px 6px;
+  margin-right: 3px;
+}
+
+#workspaces button:first-child {
+  padding-left: 0;
+}
+
+#workspaces button:last-child {
+  padding-right: 0;
+  margin-right: 0;
+}
+
+.modules-left .module{
+  min-width: 12px;
+  margin-left: 13px;
+}
+.modules-center .module,
+.modules-right .module {
+  min-width: 12px;
+  margin-right: 13px;
+}
+
+tooltip {
+  padding: 2px;
+}
+
+tooltip label {
+  padding: 2px;
+}

@@ -1,8 +1,11 @@
 {
   "include": [
-    "~/.local/share/omarchy/default/waybar/config.json",
-    "~/.config/waybar/module-*.json"
+    "~/.config/waybar/modules/*.json"
   ],
+  "layer": "top",
+  "position": "top",
+  "spacing": 0,
+  "height": 26,
   "modules-left": [
     "hyprland/workspaces"
   ],
