@@ -1,36 +1,33 @@
 #!/bin/bash
 
-MIGRATION_LOG="$HOME/.local/share/omarchy/migrations.log"
+MIGRATION_DB="$HOME/.local/share/omarchy/migrations.db"
 MIGRATION_DIR="$HOME/.local/share/omarchy/migrations"
 
-# Ensure config directory exists
-mkdir -p "$(dirname "$MIGRATION_LOG")"
+# Ensure config directory exists and initialize database
+mkdir -p "$(dirname "$MIGRATION_DB")"
+sqlite3 "$MIGRATION_DB" "CREATE TABLE IF NOT EXISTS migrations (timestamp TEXT PRIMARY KEY);"
 
 # Get list of completed migration timestamps
 get_completed_migrations() {
-  [[ -f "$MIGRATION_LOG" ]] && cat "$MIGRATION_LOG" || true
+  sqlite3 "$MIGRATION_DB" "SELECT timestamp FROM migrations;" 2>/dev/null || true
 }
 
 # Check if a specific migration has been completed
 is_migration_completed() {
   local timestamp="$1"
-  [[ -f "$MIGRATION_LOG" ]] && grep -q "^${timestamp}$" "$MIGRATION_LOG" 2>/dev/null
+  sqlite3 "$MIGRATION_DB" "SELECT 1 FROM migrations WHERE timestamp='$timestamp';" 2>/dev/null | grep -q 1
 }
 
 # Mark a migration as completed
 mark_migration_completed() {
   local timestamp="$1"
-  echo "$timestamp" >>"$MIGRATION_LOG"
+  sqlite3 "$MIGRATION_DB" "INSERT INTO migrations VALUES ('$timestamp');"
 }
 
 # Remove a migration from the completed log
 remove_migration_completed() {
   local timestamp="$1"
-  if [[ -f "$MIGRATION_LOG" ]]; then
-    # Remove the line with this timestamp
-    grep -v "^${timestamp}$" "$MIGRATION_LOG" >"${MIGRATION_LOG}.tmp" || true
-    mv "${MIGRATION_LOG}.tmp" "$MIGRATION_LOG"
-  fi
+  sqlite3 "$MIGRATION_DB" "DELETE FROM migrations WHERE timestamp='$timestamp';"
 }
 
 # Get list of pending migration files
