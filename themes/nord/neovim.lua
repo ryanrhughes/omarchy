@@ -1,18 +1,10 @@
-local helper = require("config.theme-helper")
-
--- Apply theme immediately when file is loaded
-vim.schedule(function()
-  helper.apply_theme("nordfox", "dark")
-end)
-
 return {
-  {
-    "EdenEast/nightfox.nvim",
-    lazy = false,
-    priority = 1000,
-    config = function()
-      vim.o.background = "dark"
-      vim.cmd.colorscheme("nordfox")
-    end,
-  }
+	{ "EdenEast/nightfox.nvim" },
+	{
+		"LazyVim/LazyVim",
+		opts = {
+			colorscheme = "nordfox",
+		},
+	},
 }
+
