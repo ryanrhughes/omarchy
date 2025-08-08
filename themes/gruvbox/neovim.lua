@@ -1,44 +1,18 @@
--- Theme configuration
-local plugin_name = "ellisonleao/gruvbox.nvim"
-local theme_name = "gruvbox"
-local background = "dark"
+local helper = require("config.theme-helper")
 
-local function apply_theme()
-  -- Set background
-  vim.o.background = background
-  
-  -- Try to apply colorscheme
-  local ok = pcall(vim.cmd.colorscheme, theme_name)
-  
-  if not ok then
-    -- Theme not available, trigger Lazy to install it
-    vim.cmd("Lazy install")
-    
-    -- Simple delayed retry after triggering install
-    vim.defer_fn(function()
-      vim.o.background = background
-      pcall(vim.cmd.colorscheme, theme_name)
-    end, 1000)
-  end
-end
-
--- Apply immediately on file reload
-vim.schedule(apply_theme)
+-- Apply theme immediately when file is loaded
+vim.schedule(function()
+  helper.apply_theme("gruvbox", "dark")
+end)
 
 return {
   {
-    plugin_name,
+    "ellisonleao/gruvbox.nvim",
+    lazy = false,
     priority = 1000,
     config = function()
-      -- Try setup if available
-      pcall(function()
-        local gruvbox = require(theme_name)
-        if gruvbox.setup then
-          gruvbox.setup({})
-        end
-      end)
-      vim.o.background = background
-      vim.cmd.colorscheme(theme_name)
+      vim.o.background = "dark"
+      vim.cmd.colorscheme("gruvbox")
     end,
-  },
+  }
 }
