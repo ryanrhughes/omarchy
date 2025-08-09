@@ -1,13 +1,27 @@
 
 local function apply_colorscheme(colorscheme, background)
+  -- Clear all highlight groups before applying new theme
+  vim.cmd("hi clear")
+  if vim.fn.exists("syntax_on") then
+    vim.cmd("syntax reset")
+  end
+  
   vim.o.background = (background == "light" or background == "dark") and background or "dark"
   local success = pcall(vim.cmd.colorscheme, colorscheme)
   if success then
+    -- Force redraw to ensure all UI components update
+    vim.cmd("doautocmd ColorScheme")
+    
     -- Reapply transparency settings after colorscheme change
     local transparency_file = vim.fn.expand("~/.config/nvim/plugin/after/transparency.lua")
     if vim.fn.filereadable(transparency_file) == 1 then
       vim.cmd("source " .. transparency_file)
     end
+    
+    -- Force neo-tree and other UI elements to refresh
+    vim.schedule(function()
+      vim.cmd("redraw!")
+    end)
   end
   return success
 end
@@ -19,18 +33,44 @@ local function apply_colorscheme_deferred(colorscheme, background, delay)
 end
 
 local function apply_theme()
-  -- Always reload to get latest theme
-  package.loaded["plugins.theme"] = nil
-  local theme_spec = require("plugins.theme")
+  -- Try to load the colorscheme settings
+  local theme_spec = {}
+  package.loaded["plugins.current-theme-colorscheme"] = nil
+  local ok, result = pcall(require, "plugins.current-theme-colorscheme")
+  if ok then
+    theme_spec = result
+  else
+    -- Fallback: check if old theme.lua exists
+    package.loaded["plugins.theme"] = nil
+    ok, result = pcall(require, "plugins.theme")
+    if ok then
+      theme_spec = result
+    end
+  end
+  
+  -- Try to load the plugin definition
+  local plugin_spec = {}
+  package.loaded["plugins.current-theme-plugin"] = nil
+  ok, result = pcall(require, "plugins.current-theme-plugin")
+  if ok then
+    plugin_spec = result
+  end
 
-  -- Extract theme info
-  local colorscheme, background, theme_plugin = nil, "dark", nil
+  -- Extract theme info from colorscheme spec
+  local colorscheme, background = nil, "dark"
   for _, spec in ipairs(theme_spec) do
     if spec[1] == "LazyVim/LazyVim" and spec.opts then
       colorscheme = spec.opts.colorscheme or colorscheme
       background = spec.opts.background or background
-    elseif spec[1] and spec[1] ~= "LazyVim/LazyVim" then
+    end
+  end
+  
+  -- Get the theme plugin from plugin spec
+  local theme_plugin = nil
+  for _, spec in ipairs(plugin_spec) do
+    if spec[1] and spec[1] ~= "LazyVim/LazyVim" then
       theme_plugin = spec
+      break
     end
   end
 

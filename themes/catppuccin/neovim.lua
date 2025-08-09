@@ -1,9 +1,4 @@
 return {
-	{
-		"LazyVim/LazyVim",
-		opts = {
-			colorscheme = "catppuccin-mocha",
-		},
-	},
+	-- Plugin definitions only - colorscheme configuration moved to neovim-colorscheme.lua
 }
 
